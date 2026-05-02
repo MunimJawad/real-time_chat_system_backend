@@ -1,13 +1,15 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from accounts.api.v1.serializers import RegisterSerializer, LoginSerializer 
+from accounts.api.v1.serializers import RegisterSerializer, LoginSerializer, ProfileSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from accounts.throttles import LoginThrottle, RegisterThrottle
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.exceptions import ValidationError
 from rest_framework_simplejwt.exceptions import TokenError
+from django.shortcuts import get_object_or_404
+from accounts.models import Profile
 
 class RegisterView(APIView):
     throttle_classes = [RegisterThrottle]
@@ -87,3 +89,31 @@ class Home(ProtectedView):
       })
 
 
+class ProfileView(ProtectedView):
+    def get_profile(self, pk):
+        return get_object_or_404(Profile, id=pk)
+
+    def get(self, request, profile_id):
+        profile = self.get_profile(profile_id)
+        serializer = ProfileSerializer(profile)
+        return Response({
+            "profile": serializer.data,
+        },status=status.HTTP_200_OK)
+
+    def put(self, request, profile_id):
+        profile = self.get_profile(profile_id)
+        if profile.user !=request.user:
+            return Response({
+                "error": "You are not allowed to do this"
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
+        serializer = ProfileSerializer(profile, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "profile": serializer.data,
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                "error": serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)

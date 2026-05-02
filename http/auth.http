@@ -9,8 +9,8 @@ POST http://127.0.0.1:8000/accounts/v1/register/
 Content-Type: application/json
 
 {
-  "username": "munim",
-  "email": "munim@gmail.com",
+  "username": "mimi",
+  "email": "mimi@gmail.com",
   "password": "12345678"
 
 }
@@ -34,4 +34,19 @@ Content-Type: application/json
   "refresh": "{{refresh_token}}"
 }
 
+### Profile
+GET {{base_url}}/accounts/v1/profile/2/
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
 
+### Profile Update
+PUT {{base_url}}/accounts/v1/profile/2/
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+
+    "bio": "Updated bio",
+    "date_of_birth": "1990-01-01",
+    "workplace": "TechCorp"
+}
