@@ -9,7 +9,10 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.exceptions import ValidationError
 from rest_framework_simplejwt.exceptions import TokenError
 from django.shortcuts import get_object_or_404
-from accounts.models import Profile
+from accounts.models import Profile, Connection
+from django.contrib.auth import get_user_model
+from accounts.services.accounts import ConnectionServices
+User = get_user_model()
 
 class RegisterView(APIView):
     throttle_classes = [RegisterThrottle]
@@ -117,3 +120,16 @@ class ProfileView(ProtectedView):
             return Response({
                 "error": serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ConnectionView(ProtectedView):
+    def post(self, request):
+        sender = request.user
+        receiver_id = request.data.get("receiver")
+
+        connection = ConnectionServices.create_connection(sender, receiver_id)
+
+        return Response({
+            "message": "Request sent successfully",
+            "connection": connection
+        }, status=status.HTTP_201_CREATED)

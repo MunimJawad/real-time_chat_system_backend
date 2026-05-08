@@ -40,4 +40,20 @@ class Profile(models.Model):
         return f"{self.user.username}----{self.user.email}"
 
 
+class Connection(models.Model):
+    CONNECTION_CHOICES = [
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+    ]
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sender")
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name="receiver")
+    type = models.CharField(choices=CONNECTION_CHOICES, max_length=20, default="pending", null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["sender", "receiver"], name="unique_connection"),
+        ]
+
 

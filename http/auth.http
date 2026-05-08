@@ -48,5 +48,14 @@ Content-Type: application/json
 
     "bio": "Updated bio",
     "date_of_birth": "1990-01-01",
-    "workplace": "TechCorp"
+    "workplace": "Padakhep"
+}
+
+### Connection Request
+POST {{base_url}}/accounts/v1/connection-request/
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "receiver": 2
 }

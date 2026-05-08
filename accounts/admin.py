@@ -4,3 +4,4 @@ from . import models as m
 
 admin.site.register(m.User)
 admin.site.register(m.Profile)
+admin.site.register(m.Connection)

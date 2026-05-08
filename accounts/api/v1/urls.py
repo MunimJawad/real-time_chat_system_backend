@@ -9,4 +9,6 @@ urlpatterns = [
     path('refresh/',TokenRefreshView.as_view()),
 
     path('profile/<int:profile_id>/', views.ProfileView.as_view()),
+
+    path("connection-request/", views.ConnectionView.as_view())
 ]
