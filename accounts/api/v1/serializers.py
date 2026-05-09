@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate
-from accounts.models import Profile
+from accounts.models import Profile, Connection
 
 User = get_user_model()
 
@@ -66,6 +66,21 @@ class ProfileSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+
+class ConnectionSerializer(serializers.ModelSerializer):
+    sender = UserSerializer(read_only = True)
+    receiver = UserSerializer(read_only = True)
+    class Meta:
+        model = Connection
+        fields = ["id", "sender", 'receiver', 'type', "created_at"]
+
+class ConnectionSentSerializer(serializers.ModelSerializer):
+    sender = UserSerializer(read_only=True)
+    receiver = UserSerializer(read_only=True)
+    class Meta:
+        model = Connection
+        fields = ["id", "sender", 'receiver', 'type', "created_at"]
 
 
 

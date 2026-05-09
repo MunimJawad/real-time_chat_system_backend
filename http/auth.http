@@ -51,6 +51,17 @@ Content-Type: application/json
     "workplace": "Padakhep"
 }
 
+###Pending Receives Connections
+GET {{base_url}}/accounts/v1/pending-received-connections/
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+###Pending Sent Connections
+GET {{base_url}}/accounts/v1/pedning-sent-connections/
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+
 ### Connection Request
 POST {{base_url}}/accounts/v1/connection-request/
 Authorization: Bearer {{access_token}}
@@ -58,4 +69,13 @@ Content-Type: application/json
 
 {
   "receiver": 2
+}
+
+###Update Connection
+POST {{base_url}}/accounts/v1/connection-update/4/
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "type": "accepted "
 }

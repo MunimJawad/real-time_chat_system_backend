@@ -10,5 +10,11 @@ urlpatterns = [
 
     path('profile/<int:profile_id>/', views.ProfileView.as_view()),
 
-    path("connection-request/", views.ConnectionView.as_view())
+    path("pending-received-connections/", views.PendingReceivedConnectionsView.as_view()),
+    path("pedning-sent-connections/", views.PendingSentConnectionsView.as_view()),
+    path("connection-request/", views.ConnectionView.as_view()),
+    path(
+        "connection-update/<int:pk>/",
+        views.ConnectionUpdateView.as_view()
+    ),
 ]

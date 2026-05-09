@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from accounts.api.v1.serializers import RegisterSerializer, LoginSerializer, ProfileSerializer
+from accounts.api.v1.serializers import RegisterSerializer, LoginSerializer, ProfileSerializer, ConnectionSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from accounts.throttles import LoginThrottle, RegisterThrottle
@@ -42,7 +42,7 @@ class LoginView(APIView):
             "message": "Login successful",
             "access": str(access_token),
             "refresh": str(refresh),
-            "user": {
+            "data": {
                 "id": user.id,
                 "username": user.username,
                 "email": user.email
@@ -131,5 +131,43 @@ class ConnectionView(ProtectedView):
 
         return Response({
             "message": "Request sent successfully",
-            "connection": connection
+            "data": connection
         }, status=status.HTTP_201_CREATED)
+
+
+class ConnectionUpdateView(ProtectedView):
+    def post(self, request, pk):
+        user = request.user
+        type = request.data.get("type")
+        connection = ConnectionServices.update_connection(pk, user, type)
+
+
+
+        return Response(
+            {
+                "message": "Connection updated successfully",
+                "data": connection
+            },
+            status=status.HTTP_200_OK
+        )
+
+
+class PendingReceivedConnectionsView(ProtectedView):
+    def get(self, request):
+        user = request.user
+        connections = ConnectionServices.get_pending_receive_connections(user)
+        serializer = ConnectionSerializer(connections, many=True)
+        return Response({
+            "message": "Received pending connections",
+            "data": serializer.data
+        }, status=status.HTTP_200_OK)
+
+class PendingSentConnectionsView(ProtectedView):
+    def get(self, request):
+        user = request.user
+        connections = ConnectionServices.get_sent_connections(user)
+        serializer = ConnectionSerializer(connections, many=True)
+        return Response({
+            "message": "Sent pending connections",
+            "data": serializer.data
+        }, status=status.HTTP_200_OK)
