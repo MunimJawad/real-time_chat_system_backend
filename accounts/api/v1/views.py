@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from accounts.api.v1.serializers import RegisterSerializer, LoginSerializer, ProfileSerializer, ConnectionSerializer
+from accounts.api.v1.serializers import RegisterSerializer, LoginSerializer, ProfileSerializer, ConnectionSerializer, UserSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from accounts.throttles import LoginThrottle, RegisterThrottle
@@ -12,6 +12,7 @@ from django.shortcuts import get_object_or_404
 from accounts.models import Profile, Connection
 from django.contrib.auth import get_user_model
 from accounts.services.accounts import ConnectionServices
+from accounts.services.users import UserService
 User = get_user_model()
 
 class RegisterView(APIView):
@@ -170,4 +171,38 @@ class PendingSentConnectionsView(ProtectedView):
         return Response({
             "message": "Sent pending connections",
             "data": serializer.data
+        }, status=status.HTTP_200_OK)
+
+class ConnectionsView(ProtectedView):
+    def get(self, request):
+        user = request.user
+        connections = ConnectionServices.all_connections(user)
+        serializer = ConnectionSerializer(connections, many=True)
+
+        return Response({
+            "message": "All connections",
+            "total": len(connections),
+            "data": serializer.data,
+
+        }, status=status.HTTP_200_OK)
+
+
+#  searching user, user update and refactor code the whole users and
+#  then start the conversation module
+
+#User list with searching
+
+class UserListView(ProtectedView):
+    def get(self, request):
+
+        search = request.GET.get("search")
+        users = UserService.get_users(search)
+
+        serializer = UserSerializer(users, many=True)
+
+        return Response({
+            "message": "All Users",
+            "total": len(users),
+            "data": serializer.data,
+
         }, status=status.HTTP_200_OK)

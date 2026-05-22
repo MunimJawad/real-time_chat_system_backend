@@ -1,3 +1,5 @@
+from django.dispatch import receiver
+from django.db.models import Q
 from accounts.models import Connection
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
@@ -14,6 +16,13 @@ class ConnectionServices:
     def get_sent_connections(user):
         connections = Connection.objects.filter(sender=user, type="pending").order_by("-created_at")
         return connections
+
+    @staticmethod
+    def all_connections(user):
+        return Connection.objects.filter(
+            Q(sender=user) | Q(receiver=user),
+            type="accepted"
+        ).order_by("-created_at")
 
     @staticmethod
     def create_connection(sender, receiver_id, **kwargs):

@@ -17,4 +17,9 @@ urlpatterns = [
         "connection-update/<int:pk>/",
         views.ConnectionUpdateView.as_view()
     ),
+
+    #Connection List
+    path('connections/', views.ConnectionsView.as_view()),
+
+path('users/', views.UserListView.as_view()),
 ]

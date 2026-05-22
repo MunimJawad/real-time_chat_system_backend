@@ -79,3 +79,13 @@ Content-Type: application/json
 {
   "type": "accepted "
 }
+
+###All Connections
+GET {{base_url}}/accounts/v1/connections/
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+###All Users
+GET {{base_url}}/accounts/v1/users/?search=root
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
