@@ -72,7 +72,7 @@ Content-Type: application/json
 }
 
 ###Update Connection
-POST {{base_url}}/accounts/v1/connection-update/4/
+PATCH {{base_url}}/accounts/v1/connection-update/4/
 Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
@@ -86,6 +86,6 @@ Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
 ###All Users
-GET {{base_url}}/accounts/v1/users/?search=root
+GET {{base_url}}/accounts/v1/users/?search=munim
 Authorization: Bearer {{access_token}}
 Content-Type: application/json

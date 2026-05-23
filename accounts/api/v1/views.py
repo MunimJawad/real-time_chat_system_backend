@@ -14,7 +14,7 @@ from django.contrib.auth import get_user_model
 from accounts.services.accounts import ConnectionServices
 from accounts.services.users import UserService
 User = get_user_model()
-
+from common.response import success_response,error_response
 class RegisterView(APIView):
     throttle_classes = [RegisterThrottle]
     def post(self, request):
@@ -137,7 +137,7 @@ class ConnectionView(ProtectedView):
 
 
 class ConnectionUpdateView(ProtectedView):
-    def post(self, request, pk):
+    def patch(self, request, pk):
         user = request.user
         type = request.data.get("type")
         connection = ConnectionServices.update_connection(pk, user, type)
@@ -178,17 +178,14 @@ class ConnectionsView(ProtectedView):
         user = request.user
         connections = ConnectionServices.all_connections(user)
         serializer = ConnectionSerializer(connections, many=True)
-
-        return Response({
-            "message": "All connections",
+        data = {
             "total": len(connections),
             "data": serializer.data,
+        }
+        return success_response(message="Connections List", data=data, status_code= status.HTTP_200_OK)
 
-        }, status=status.HTTP_200_OK)
 
 
-#  searching user, user update and refactor code the whole users and
-#  then start the conversation module
 
 #User list with searching
 
@@ -199,10 +196,16 @@ class UserListView(ProtectedView):
         users = UserService.get_users(search)
 
         serializer = UserSerializer(users, many=True)
+        data = {
+             "total": len(users),
+             "data": serializer.data,
+        }
+        return success_response(message="All Users", data=data, status_code= status.HTTP_200_OK)
 
-        return Response({
-            "message": "All Users",
-            "total": len(users),
-            "data": serializer.data,
 
-        }, status=status.HTTP_200_OK)
+
+#Create global exception handler ans pagination ,model inside common folder
+# Cursor Pagination in users list. connection list and everyhwere it needed.
+#logging
+
+# After Eid start the conversation module
