@@ -13,8 +13,12 @@ from accounts.models import Profile, Connection
 from django.contrib.auth import get_user_model
 from accounts.services.accounts import ConnectionServices
 from accounts.services.users import UserService
-User = get_user_model()
 from common.response import success_response,error_response
+from common.pagination import paginate_queryset
+
+
+User = get_user_model()
+
 class RegisterView(APIView):
     throttle_classes = [RegisterThrottle]
     def post(self, request):
@@ -189,23 +193,28 @@ class ConnectionsView(ProtectedView):
 
 #User list with searching
 
-class UserListView(ProtectedView):
+class UserListView(APIView):
     def get(self, request):
-
         search = request.GET.get("search")
         users = UserService.get_users(search)
 
-        serializer = UserSerializer(users, many=True)
-        data = {
-             "total": len(users),
-             "data": serializer.data,
-        }
-        return success_response(message="All Users", data=data, status_code= status.HTTP_200_OK)
+        data = paginate_queryset(
+            queryset=users,
+            request=request,
+            view=self,
+            serializer_class=UserSerializer
+        )
+
+        return success_response(
+            message="All Users",
+            data=data,
+            status_code=status.HTTP_200_OK
+        )
 
 
 
-#Create global exception handler ans pagination ,model inside common folder
-# Cursor Pagination in users list. connection list and everyhwere it needed.
+
+
 #logging
 
 # After Eid start the conversation module

@@ -11,4 +11,4 @@ class UserService:
         else:
             users = User.objects.all()
 
-        return users
+        return users.order_by("-id")
