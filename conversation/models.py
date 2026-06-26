@@ -31,12 +31,16 @@ class Conversation(BaseModel):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="created_conversation")
     name = models.CharField(max_length=200, null=True, blank=True)#group chat name
 
+    unique_key = models.CharField(max_length=255, unique=True, null=True, blank=True)
+
     class Meta:
         db_table = "conversation"
         ordering= ["-created_at"]
 
     def __str__(self):
         return f"{self.created_by} - {self.type}----{self.name}"
+
+    
 
 
 class Participant(BaseModel):
@@ -83,11 +87,7 @@ class Message(BaseModel):
     content = models.TextField()
     is_edited = models.BooleanField(default=False)
 
-    is_deleted = models.BooleanField(default=False)
-    deleted_at = models.DateTimeField(
-        null=True,
-        blank=True
-    )
+
 
     class Meta:
         db_table = "message"
