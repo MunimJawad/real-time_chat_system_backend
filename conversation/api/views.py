@@ -19,7 +19,7 @@ def home(request):
 
 
 
-#next week Create conversation, read each conversation, add participants system, create message or update message.
+
 
 class ConversationView(APIView):
     permission_classes = [IsAuthenticated]
@@ -51,3 +51,6 @@ class ConversationView(APIView):
         return success_response(data=data, message="Conversation get or created successfully.", status_code=status.HTTP_200_OK)
 
 
+#next week add and remove participants in conversations, leave from group conversation,delete conversations,
+# show conversation list for each user, conversation detail with messages,
+# create message or update message in conversation, search conversations and messages in there pages.

@@ -28,13 +28,13 @@ class CreateConversation:
         except User.DoesNotExist:
             raise ValidationError("Participant_id is invalid")
 
-        # ✅ CREATE UNIQUE KEY
+        #CREATE UNIQUE KEY
         key = CreateConversation.get_direct_key(
             request.user.id,
             participant.id
         )
 
-        # ✅ GET OR CREATE CONVERSATION
+        # GET OR CREATE CONVERSATION
         conversation, created = Conversation.objects.get_or_create(
             type=ConversationType.DIRECT,
             unique_key=key,
@@ -43,7 +43,7 @@ class CreateConversation:
             }
         )
 
-        # ✅ Only create participants if new conversation
+        #Only create participants if new conversation
         if created:
             Participant.objects.bulk_create([
                 Participant(
