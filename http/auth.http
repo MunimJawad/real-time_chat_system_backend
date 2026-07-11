@@ -90,6 +90,12 @@ GET {{base_url}}/accounts/v1/users/
 Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
+###Conversations List
+GET {{base_url}}/conversation/v1/conversations/
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+
 
 ###Create Conversation
 POST {{base_url}}/conversation/v1/conversations/
@@ -97,7 +103,7 @@ Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
 {
-  "type": "GROUP",
-  "name": "Test",
-  "participant_ids": [2, 5, 3]
+  "type": "DIRECT",
+
+  "participant_id":  3
 }
