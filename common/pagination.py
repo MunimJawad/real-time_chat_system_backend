@@ -2,14 +2,14 @@ from rest_framework.pagination import CursorPagination
 
 
 class MyCursorPagination(CursorPagination):
-    page_size = 2
+    page_size = 10
     max_page_size = 100
     ordering = "-id"
     page_size_query_param = "page_size"
     page_query_param = "cursor"
 
 
-def paginate_queryset(queryset, request, view, serializer_class):
+def paginate_queryset(queryset, request, view, serializer_class, context = None):
     pagination = MyCursorPagination()
 
     paginated_queryset = pagination.paginate_queryset(
@@ -20,7 +20,8 @@ def paginate_queryset(queryset, request, view, serializer_class):
 
     serializer = serializer_class(
         paginated_queryset,
-        many=True
+        many=True,
+        context=context
     )
 
     return {

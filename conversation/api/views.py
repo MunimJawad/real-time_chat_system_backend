@@ -16,6 +16,7 @@ ParticipantSerializer, ConversationSerializer
 )
 from conversation.models import Conversation
 from common.response import success_response, error_response
+from common.pagination import paginate_queryset
 
 # Create your views here.
 def home(request):
@@ -39,15 +40,16 @@ class ConversationView(APIView):
             .prefetch_related(
                 Prefetch(
                     "participants",
-                    queryset=Participant.objects.select_related("user")
+                    queryset=Participant.objects.select_related("user", "user__profile")
                 )
             )
-            .distinct()
+            .distinct().order_by("-updated_at")
         )
 
-        serializer = ConversationSerializer(conversations, many=True)
+        data = paginate_queryset(queryset=conversations, request=request, view= self, serializer_class=ConversationSerializer, context={"request": request})
 
-        return success_response(data=serializer.data, message="Conversation list successfully.", status_code=status.HTTP_200_OK)
+        return success_response(data=data, message="Conversation list successfully.", status_code=status.HTTP_200_OK)
+
 
     def post(self, request):
         conversation_type = request.data.get("type")
@@ -76,6 +78,6 @@ class ConversationView(APIView):
         return success_response(data=data, message="Conversation get or created successfully.", status_code=status.HTTP_200_OK)
 
 
-#next week add and remove participants in conversations, leave from group conversation,delete conversations,
-#add pagination in conversation list and  conversation detail with messages,
+#next week add and remove participants in group conversations, leave from group conversation,delete conversations,
+# conversation detail with messages,
 # create message or update message in conversation, search conversations and messages in there pages.
