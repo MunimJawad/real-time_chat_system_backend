@@ -3,7 +3,11 @@ from conversation.models import Participant, Conversation, ConversationType
 from accounts.api.v1.serializers import UserSerializer
 from accounts.models import Profile
 
-
+class AddParticipantSerializer(serializers.Serializer):
+    participant_ids = serializers.ListField(
+        child=serializers.IntegerField(min_value=1),
+        allow_empty=False,
+    )
 
 class ParticipantSerializer(serializers.ModelSerializer):
     user_info = UserSerializer(read_only = True, source='user')

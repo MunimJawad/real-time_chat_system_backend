@@ -1,18 +1,17 @@
-from django.db.models import Model
-from rest_framework.response import Response
+
 from django.http import JsonResponse
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from django.db.models import Q, Prefetch
-import conversation
+
 from conversation.services.create_conversation import (
 CreateConversation
 )
 from conversation.models import ConversationType, Participant
 from rest_framework import status
-from django.core.exceptions import BadRequest
+from django.core.exceptions import BadRequest, ValidationError, PermissionDenied
 from conversation.api.serializers import (
-ParticipantSerializer, ConversationSerializer
+ParticipantSerializer, ConversationSerializer, AddParticipantSerializer
 )
 from conversation.models import Conversation
 from common.response import success_response, error_response
@@ -77,7 +76,91 @@ class ConversationView(APIView):
 
         return success_response(data=data, message="Conversation get or created successfully.", status_code=status.HTTP_200_OK)
 
+from conversation.services.add_remove_participants import ParticipantService
+class AddParticipantView(APIView):
+    permission_classes = [IsAuthenticated]
+    def patch(self, request, conversation_id):
+        try:
+            conversation = Conversation.objects.get(id=conversation_id)
+        except Conversation.DoesNotExist:
+            raise ValidationError("Conversation does not exist.")
 
-#next week add and remove participants in group conversations, leave from group conversation,delete conversations,
+        is_admin = Participant.objects.filter(
+            conversation=conversation,
+            user=request.user,
+            is_conversation_admin=True,
+        ).exists()
+
+        if not is_admin:
+            raise PermissionDenied(
+                "You do not have permission to add participants."
+            )
+
+        serializer = AddParticipantSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        result = ParticipantService.add_participants(conversation,
+                                                     user_ids=serializer.validated_data["participant_ids"]
+                                                     )
+
+        participants = ParticipantSerializer(
+            result.participants.select_related("user"),
+            many=True
+        ).data
+
+        data = {
+            "id": result.id,
+            "type": result.type,
+            "name": result.name,
+            "participants": participants
+        }
+        return success_response(data=data, message="Participants added successfully.",
+                                status_code=status.HTTP_200_OK)
+
+
+class RemoveParticipantView(APIView):
+    permission_classes = [IsAuthenticated]
+    def delete(self, request, conversation_id):
+        try:
+            conversation = Conversation.objects.get(id=conversation_id)
+        except Conversation.DoesNotExist:
+            raise ValidationError("Conversation does not exist.")
+
+        is_admin = Participant.objects.filter(
+            conversation=conversation,
+            user=request.user,
+            is_conversation_admin=True,
+        ).exists()
+
+        if not is_admin:
+            raise PermissionDenied(
+                "You do not have permission to remove participants."
+            )
+
+        serializer = AddParticipantSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        result = ParticipantService.remove_participants(conversation,
+                                                        user_ids=serializer.validated_data["participant_ids"]
+                                                        )
+        participants = ParticipantSerializer(
+            result["conversation"].participants.select_related("user"),
+            many=True
+        ).data
+
+        data = {
+            "deleted_count": result["deleted_count"],
+            "id": result["conversation"].id,
+            "type": result["conversation"].type,
+            "name": result["conversation"].name,
+            "participants": participants
+        }
+        return success_response(data=data, message="Participants removed successfully.",
+                                status_code=status.HTTP_200_OK)
+
+
+
+
+# leave from group conversation,delete conversations,
 # conversation detail with messages,
 # create message or update message in conversation, search conversations and messages in there pages.
+
+
